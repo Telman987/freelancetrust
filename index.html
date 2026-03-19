@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreelanceTrust — Trust Score for Upwork & Fiverr</title>
+<meta name="description" content="Instant Trust Score 0–100 for every Upwork and Fiverr freelancer. Spot red flags, fake reviews and scams before you hire. Free Chrome extension.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--green:#14A868;--green-d:#0C7A4C;--green-l:#E0F7ED;--red:#E03C3C;--red-l:#FEE8E8;--amber:#C47E12;--amber-l:#FFF3DA;--purple:#534AB7;--purp-l:#EEEDFC;--dark:#101C14;--dark2:#162018;--white:#FFFFFF;--g1:#1A1A1A;--g2:#4A4A4A;--g3:#909090;--g4:#E8E8E8;--bg:#F5F5F3}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--g1);overflow-x:hidden}
+.hero{background:var(--dark);min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 50%,#1A3A22 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,#0C2A16 0%,transparent 60%)}
+.rings{position:absolute;right:-80px;top:50%;transform:translateY(-50%);width:600px;height:600px}
+.rings span{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(20,168,104,.15);animation:pulse 4s ease-in-out infinite}
+.rings span:nth-child(1){transform:scale(.35);animation-delay:0s}
+.rings span:nth-child(2){transform:scale(.55);animation-delay:.4s}
+.rings span:nth-child(3){transform:scale(.72);animation-delay:.8s}
+.rings span:nth-child(4){transform:scale(.88);animation-delay:1.2s}
+.rings span:nth-child(5){transform:scale(1);animation-delay:1.6s}
+@keyframes pulse{0%,100%{opacity:.15}50%{opacity:.45}}
+nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:24px 60px}
+.logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:20px;color:var(--white);letter-spacing:-.5px}
+.logo span{color:var(--green)}
+.nav-cta{background:var(--green);color:var(--white);padding:10px 22px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:var(--green-d)}
+.hero-body{flex:1;display:flex;align-items:center;padding:0 60px;position:relative;z-index:5;gap:60px}
+.hero-text{max-width:560px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(20,168,104,.12);border:1px solid rgba(20,168,104,.25);padding:6px 14px;border-radius:20px;font-size:12px;color:var(--green);font-weight:500;margin-bottom:24px;animation:fadeUp .6s ease both}
+h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(40px,5vw,62px);font-weight:800;line-height:1.05;color:var(--white);letter-spacing:-1.5px;animation:fadeUp .6s ease .1s both}
+h1 em{font-style:normal;color:var(--green)}
+.hero-sub{font-size:17px;color:rgba(255,255,255,.6);line-height:1.6;margin-top:20px;max-width:480px;animation:fadeUp .6s ease .2s both}
+.hero-actions{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap;animation:fadeUp .6s ease .3s both}
+.btn-primary{background:var(--purple);color:var(--white);padding:14px 28px;border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;transition:background .2s,transform .15s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{background:#3C3489;transform:translateY(-1px)}
+.btn-ghost{color:rgba(255,255,255,.7);padding:14px 24px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid rgba(255,255,255,.15);transition:border-color .2s,color .2s}
+.btn-ghost:hover{border-color:var(--green);color:var(--green)}
+.hero-note{margin-top:16px;font-size:12px;color:rgba(255,255,255,.35);animation:fadeUp .6s ease .4s both}
+.widget-preview{background:var(--white);border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.4);width:280px;flex-shrink:0;overflow:hidden;animation:fadeUp .6s ease .2s both}
+.wp-header{background:#F7F7F5;border-bottom:1px solid #EBEBEB;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.wp-logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:12px;color:var(--g1)}
+.wp-badge{font-size:10px;color:#888;background:#EBEBEB;padding:2px 8px;border-radius:4px}
+.wp-score{display:flex;align-items:center;gap:14px;padding:14px}
+.wp-circle{width:64px;height:64px;border-radius:50%;border:3px solid var(--green);background:var(--green-l);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.wp-num{font-size:22px;font-weight:800;color:var(--green-d);line-height:1;font-family:'Plus Jakarta Sans',sans-serif}
+.wp-den{font-size:9px;color:var(--green-d);opacity:.7}
+.wp-label{font-size:15px;font-weight:700}
+.wp-name{font-size:11px;color:var(--g2);margin-top:2px}
+.wp-meta{font-size:10px;color:var(--g3);margin-top:2px}
+.wp-section{padding:0 14px 10px}
+.wp-stitle{font-size:9px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.wp-pos{font-size:10px;color:#085041;padding:2px 0}
+.wp-divider{height:1px;background:#EBEBEB;margin:2px 0}
+.wp-pro{padding:10px 14px}
+.wp-pro-title{font-size:9px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.wp-pro-row{font-size:10px;color:#C0C0C0;padding:2px 0}
+.wp-btn{margin:10px 12px;display:block;background:var(--purple);color:var(--white);text-align:center;padding:9px;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none}
+.wp-counter{font-size:10px;color:var(--g3);text-align:center;padding:6px 14px 12px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.stats-bar{background:var(--white);border-top:1px solid var(--g4);border-bottom:1px solid var(--g4);padding:28px 60px;display:flex;justify-content:center;gap:80px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-n{font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:var(--g1)}
+.stat-l{font-size:13px;color:var(--g3);margin-top:2px}
+.section{padding:100px 60px;max-width:1200px;margin:0 auto}
+.section-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:12px}
+h2{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(28px,3.5vw,42px);font-weight:800;letter-spacing:-1px;color:var(--g1);line-height:1.1}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.step{background:var(--white);border:1px solid var(--g4);border-radius:16px;padding:32px 28px;transition:transform .2s,box-shadow .2s}
+.step:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.07)}
+.step-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:48px;font-weight:800;color:var(--g4);line-height:1;margin-bottom:16px}
+.step h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;margin-bottom:10px}
+.step p{font-size:14px;color:var(--g2);line-height:1.6}
+.scores-section{background:var(--dark);padding:100px 60px;position:relative;overflow:hidden}
+.scores-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 90% 50%,#1A3A22 0%,transparent 70%)}
+.scores-inner{max-width:1200px;margin:0 auto;position:relative;z-index:2}
+.scores-section h2{color:var(--white)}
+.scores-section .section-tag{color:var(--green)}
+.score-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:56px}
+.score-card{background:rgba(255,255,255,.04);border-radius:16px;padding:28px 24px;border:1px solid rgba(255,255,255,.06);transition:transform .2s}
+.score-card:hover{transform:translateY(-3px)}
+.sc-top{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.sc-circle{width:60px;height:60px;border-radius:50%;border:3px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.sc-n{font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;line-height:1}
+.sc-d{font-size:8px;opacity:.7}
+.sc-label{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700}
+.sc-sub{font-size:12px;color:rgba(255,255,255,.4);margin-top:3px}
+.sc-item{font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.sc-item:last-child{border:none}
+.sc-ok{color:#6FCCA0}.sc-bad{color:#F08080}.sc-na{color:rgba(255,255,255,.3)}
+.pricing-section{padding:100px 60px}
+.pricing-inner{max-width:1000px;margin:0 auto}
+.pricing-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:56px;align-items:start}
+.pc{background:var(--white);border:1px solid var(--g4);border-radius:16px;padding:28px 24px;position:relative}
+.pc.featured{border-color:var(--purple);border-width:2px;padding-top:44px}
+.pc-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--purple);color:var(--white);font-size:10px;font-weight:700;padding:4px 16px;border-radius:0 0 8px 8px;white-space:nowrap}
+.pc-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700}
+.pc-price{font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;margin-top:6px}
+.pc-per{font-size:12px;color:var(--g3);margin-left:4px;font-weight:400;font-family:'Manrope',sans-serif}
+.pc-divider{height:1px;background:var(--g4);margin:16px 0}
+.pc-feat{font-size:13px;padding:5px 0}
+.pc-feat.yes{color:var(--g1)}.pc-feat.no{color:var(--g3)}
+.pc-btn{display:block;text-align:center;padding:12px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;margin-top:20px;transition:opacity .2s}
+.pc-btn:hover{opacity:.85}
+.pc-btn.purple{background:var(--purple);color:var(--white)}
+.pc-btn.outline-amber{border:1.5px solid var(--amber);color:var(--amber)}
+.faq-section{padding:80px 60px;background:var(--white)}
+.faq-inner{max-width:720px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--g4);padding:20px 0;cursor:pointer}
+.faq-q{font-weight:600;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.faq-a{font-size:14px;color:var(--g2);line-height:1.6;margin-top:10px;display:none}
+.faq-item.open .faq-a{display:block}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-arrow{transition:transform .2s;color:var(--g3);font-size:12px}
+footer{background:var(--dark);padding:40px 60px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:16px;color:var(--white)}
+.footer-logo span{color:var(--green)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:13px;color:rgba(255,255,255,.4);text-decoration:none}
+.footer-links a:hover{color:var(--green)}
+.footer-copy{font-size:12px;color:rgba(255,255,255,.25)}
+@media(max-width:768px){
+  nav,.hero-body,.stats-bar,.section,.scores-section,.pricing-section,.faq-section,footer{padding-left:24px;padding-right:24px}
+  .hero-body{flex-direction:column;padding-top:40px;padding-bottom:60px}
+  .widget-preview{width:100%;max-width:300px}
+  .steps,.score-cards,.pricing-cards{grid-template-columns:1fr}
+  .stats-bar{gap:32px}
+  .rings{display:none}
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="rings"><span></span><span></span><span></span><span></span><span></span></div>
+  <nav>
+    <div class="logo">Freelance<span>Trust</span></div>
+    <a href="https://chrome.google.com/webstore" class="nav-cta">Add to Chrome — Free</a>
+  </nav>
+  <div class="hero-body">
+    <div class="hero-text">
+      <div class="hero-badge">🆓 Free Chrome Extension</div>
+      <h1>Know who<br>to <em>hire.</em><br>Before you pay.</h1>
+      <p class="hero-sub">Instant Trust Score 0–100 for every freelancer on Upwork and Fiverr. Spot red flags, fake reviews and scam patterns — right on the profile page.</p>
+      <div class="hero-actions">
+        <a href="https://chrome.google.com/webstore" class="btn-primary">🔒 Add to Chrome — Free</a>
+        <a href="#how" class="btn-ghost">See how it works</a>
+      </div>
+      <p class="hero-note">No account required · Works on Upwork & Fiverr · 20 free checks/day</p>
+    </div>
+    <div class="widget-preview">
+      <div class="wp-header"><span class="wp-logo">FreelanceTrust</span><span class="wp-badge">Upwork</span></div>
+      <div class="wp-score">
+        <div class="wp-circle"><span class="wp-num">91</span><span class="wp-den">/100</span></div>
+        <div><div class="wp-label" style="color:#0C7A4C">Trusted</div><div class="wp-name">Alex Korolenko</div><div class="wp-meta">★ 4.97 · 147 jobs</div></div>
+      </div>
+      <div class="wp-section">
+        <div class="wp-stitle">Positives</div>
+        <div class="wp-pos">✓ Job Success Score: 91% — excellent</div>
+        <div class="wp-pos">✓ Rating: 4.97 ★</div>
+        <div class="wp-pos">✓ 147 completed jobs</div>
+      </div>
+      <div class="wp-divider"></div>
+      <div class="wp-section"><div class="wp-stitle">Alerts</div><div class="wp-pos">✓ No red flags detected</div></div>
+      <div class="wp-divider"></div>
+      <div class="wp-pro">
+        <div class="wp-pro-title">Pro Features</div>
+        <div class="wp-pro-row">🔒 Score history</div>
+        <div class="wp-pro-row">🔒 AI review analysis</div>
+        <div class="wp-pro-row">🔒 Cross-platform check</div>
+      </div>
+      <a href="#pricing" class="wp-btn">Unlock Pro — $9/month →</a>
+      <div class="wp-counter">✓ 7 free checks left today</div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-n">2</div><div class="stat-l">Platforms supported</div></div>
+  <div class="stat"><div class="stat-n">0–100</div><div class="stat-l">Trust Score range</div></div>
+  <div class="stat"><div class="stat-n">20</div><div class="stat-l">Free checks per day</div></div>
+  <div class="stat"><div class="stat-n">$0</div><div class="stat-l">To get started</div></div>
+</div>
+
+<section id="how"><div class="section">
+  <div class="section-tag">How it works</div>
+  <h2>Three steps.<br>Zero effort.</h2>
+  <div class="steps">
+    <div class="step"><div class="step-num">01</div><h3>Install the extension</h3><p>Add FreelanceTrust to Chrome in one click. No account, no email, no setup required.</p></div>
+    <div class="step"><div class="step-num">02</div><h3>Browse freelancer profiles</h3><p>Visit any profile on Upwork or Fiverr. The widget appears automatically in the corner.</p></div>
+    <div class="step"><div class="step-num">03</div><h3>Read the Trust Score</h3><p>See a score 0–100, green positives and red alerts — then decide with confidence.</p></div>
+  </div>
+</div></section>
+
+<section class="scores-section"><div class="scores-inner">
+  <div class="section-tag">Score examples</div>
+  <h2 style="color:#fff">Every score tells a story.</h2>
+  <div class="score-cards">
+    <div class="score-card">
+      <div class="sc-top">
+        <div class="sc-circle" style="border-color:#14A868;background:rgba(20,168,104,.1)"><span class="sc-n" style="color:#14A868">91</span><span class="sc-d" style="color:#14A868">/100</span></div>
+        <div><div class="sc-label" style="color:#6FCCA0">Trusted</div><div class="sc-sub">Alex K. · Upwork</div></div>
+      </div>
+      <div class="sc-item sc-ok">✓ Job Success Score: 91%</div>
+      <div class="sc-item sc-ok">✓ Rating: 4.97 ★</div>
+      <div class="sc-item sc-ok">✓ 147 completed jobs</div>
+      <div class="sc-item sc-ok">✓ Established account (6 yrs)</div>
+      <div class="sc-item sc-ok">✓ No red flags detected</div>
+    </div>
+    <div class="score-card">
+      <div class="sc-top">
+        <div class="sc-circle" style="border-color:#C47E12;background:rgba(196,126,18,.1)"><span class="sc-n" style="color:#C47E12">63</span><span class="sc-d" style="color:#C47E12">/100</span></div>
+        <div><div class="sc-label" style="color:#E8B96A">Moderate</div><div class="sc-sub">Sam T. · Fiverr</div></div>
+      </div>
+      <div class="sc-item sc-ok">✓ Rating: 4.5 ★</div>
+      <div class="sc-item sc-ok">✓ 18 completed orders</div>
+      <div class="sc-item sc-bad">⚠ Account less than 1 year old</div>
+      <div class="sc-item sc-bad">⚠ Low review count</div>
+      <div class="sc-item sc-na">— Score history unavailable</div>
+    </div>
+    <div class="score-card">
+      <div class="sc-top">
+        <div class="sc-circle" style="border-color:#E03C3C;background:rgba(224,60,60,.1)"><span class="sc-n" style="color:#E03C3C">26</span><span class="sc-d" style="color:#E03C3C">/100</span></div>
+        <div><div class="sc-label" style="color:#F08080">Risky</div><div class="sc-sub">Unknown · Upwork</div></div>
+      </div>
+      <div class="sc-item sc-bad">⚠ No Job Success Score</div>
+      <div class="sc-item sc-bad">⚠ Keywords "refund", "ghost"</div>
+      <div class="sc-item sc-bad">⚠ Only 2 jobs completed</div>
+      <div class="sc-item sc-bad">⚠ New account, high claims</div>
+      <div class="sc-item sc-na">— Not enough data</div>
+    </div>
+  </div>
+</div></section>
+
+<section id="pricing" class="pricing-section"><div class="pricing-inner">
+  <div class="section-tag">Pricing</div>
+  <h2>Simple, honest pricing.</h2>
+  <div class="pricing-cards">
+    <div class="pc">
+      <div class="pc-name">Free</div>
+      <div class="pc-price">$0<span class="pc-per">/ forever</span></div>
+      <div class="pc-divider"></div>
+      <div class="pc-feat yes">✓ Trust Score 0–100</div>
+      <div class="pc-feat yes">✓ Red flags &amp; positives</div>
+      <div class="pc-feat yes">✓ Basic keyword alerts</div>
+      <div class="pc-feat yes">✓ Upwork &amp; Fiverr</div>
+      <div class="pc-feat no">✗ 20 profiles/day only</div>
+      <div class="pc-feat no">✗ No score history</div>
+      <a href="https://chrome.google.com/webstore" class="pc-btn" style="background:var(--green-l);color:var(--green-d)">Add to Chrome — Free</a>
+    </div>
+    <div class="pc featured">
+      <div class="pc-badge">Most Popular</div>
+      <div class="pc-name">Pro</div>
+      <div class="pc-price" style="color:var(--purple)">$9<span class="pc-per">/ month</span></div>
+      <div class="pc-divider"></div>
+      <div class="pc-feat yes">✓ Everything in Free</div>
+      <div class="pc-feat yes">✓ Unlimited profiles/day</div>
+      <div class="pc-feat yes">✓ Score history 6 months</div>
+      <div class="pc-feat yes">✓ AI review pattern analysis</div>
+      <div class="pc-feat yes">✓ Cross-platform check</div>
+      <div class="pc-feat yes">✓ Score drop alerts</div>
+      <div class="pc-feat yes">✓ PDF report export</div>
+      <a href="https://nowpayments.io/payment/?iid=5002692336" class="pc-btn purple">Unlock Pro — $9/month →</a>
+    </div>
+    <div class="pc">
+      <div class="pc-name">Team</div>
+      <div class="pc-price" style="color:var(--amber)">$29<span class="pc-per">/ month</span></div>
+      <div class="pc-divider"></div>
+      <div class="pc-feat yes">✓ Everything in Pro</div>
+      <div class="pc-feat yes">✓ Up to 5 users</div>
+      <div class="pc-feat yes">✓ Shared freelancer lists</div>
+      <div class="pc-feat yes">✓ Team PDF reports</div>
+      <div class="pc-feat yes">✓ Priority support</div>
+      <a href="https://nowpayments.io/payment/?iid=5902654642" class="pc-btn outline-amber">Get Team Plan →</a>
+    </div>
+  </div>
+</div></section>
+
+<section class="faq-section"><div class="faq-inner">
+  <div class="section-tag">FAQ</div>
+  <h2>Questions &amp; answers.</h2><br><br>
+  <div class="faq-item open">
+    <div class="faq-q">Does it work on both Upwork and Fiverr? <span class="faq-arrow">▼</span></div>
+    <div class="faq-a">Yes. FreelanceTrust automatically activates on any Upwork freelancer profile and any Fiverr seller page.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Do I need to create an account? <span class="faq-arrow">▼</span></div>
+    <div class="faq-a">No account needed. Install the extension and it works instantly — no signup, no email, no login.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">How is the Trust Score calculated? <span class="faq-arrow">▼</span></div>
+    <div class="faq-a">The score is based on Job Success Score, client ratings, number of completed jobs, account age, hours worked, and keyword analysis of reviews. Everything is transparent — you see exactly what contributed to the score.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">What's the daily limit on the free plan? <span class="faq-arrow">▼</span></div>
+    <div class="faq-a">Free users can check up to 20 profiles per day. The counter resets at midnight. Upgrade to Pro for unlimited checks.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Does the extension read or store my data? <span class="faq-arrow">▼</span></div>
+    <div class="faq-a">FreelanceTrust only reads publicly visible profile data on the page. No personal data is collected or sent anywhere. The daily counter is stored locally in your browser.</div>
+  </div>
+</div></section>
+
+<footer>
+  <div class="footer-logo">Freelance<span>Trust</span></div>
+  <div class="footer-links">
+    <a href="/cdn-cgi/l/email-protection#86f5f3f6f6e9f4f2c6e0f4e3e3eae7e8e5e3f2f4f3f5f2a8e7f6f6">Support</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#how">How it works</a>
+  </div>
+  <div class="footer-copy">© 2025 FreelanceTrust. All rights reserved.</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+document.querySelect
